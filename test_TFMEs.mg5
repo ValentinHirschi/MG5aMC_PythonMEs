@@ -1,0 +1,8 @@
+define ud=u d
+define udx=u~ d~
+define v = a z
+generate e+ e- > ud udx v @1
+add process mu+ mu- > ud udx @2
+!rm -rf TFMEs_output_example 
+output TFMEs TFMEs_output_example
+!cd TFMEs_output_example && ./check_sa.py
