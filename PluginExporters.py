@@ -1,6 +1,6 @@
 #####################################################
 #                                                   #
-#  Source file of the TFMEs MG5aMC plugin.          #
+#  Source file of the MG5aMC_PythonMEs plugin.      #
 #                                                   #
 #         author: Valentin Hirschi                  #
 #                                                   #
@@ -35,16 +35,16 @@ from madgraph.iolibs.files import cp, ln, mv
 
 import madgraph.iolibs.helas_call_writers as helas_call_writers
 
-logger = logging.getLogger('TFMEs_plugin.MEExporter')
+logger = logging.getLogger('MG5aMC_PythonMEs.MEExporter')
 
 pjoin = os.path.join 
 
 
-class UFOModelConverterTF(export_cpp.UFOModelConverterCPP):
+class UFOModelConverterPython(export_cpp.UFOModelConverterCPP):
 
     # Static variables (for inheritance)
-    output_name = 'TF Standalone'
-    namespace = 'TF'
+    output_name = 'Python Standalone'
+    namespace = 'Python'
 
     # Dictionary from Python type to C++ type
     type_dict = {"real": "float",
@@ -300,7 +300,7 @@ class UFOModelConverterTF(export_cpp.UFOModelConverterCPP):
     # Routines for writing the ALOHA files
 
     def write_aloha_routines(self):
-        """Generate the python TF-ised aloha routines"""
+        """Generate the python aloha routines"""
        
 
         self.aloha_model.add_Lorentz_object(self.model.get('lorentz'))
@@ -364,12 +364,12 @@ class UFOModelConverterTF(export_cpp.UFOModelConverterCPP):
          
         return open(pjoin(plugin_path,'templates',filename),'r').read()
 
-class ProcessOutputTF(export_v4.ProcessExporterFortranSA):
+class ProcessOutputPython(export_v4.ProcessExporterFortranSA):
     check = False
     exporter = 'v4'
     output = 'dir'
 
-class TFMEExporter(export_python.ProcessExporterPython):
+class PythonMEExporter(export_python.ProcessExporterPython):
 
     def get_python_matrix_methods(self, gauge_check=False):
         """Write the matrix element calculation method for the processes"""
@@ -516,7 +516,7 @@ class TFMEExporter(export_python.ProcessExporterPython):
                          "%(coup)s = model.%(coup)s"\
                               % {"coup": coup} for coup in couplings])
 
-class ProcessExporterTF(object):
+class ProcessExporterPython(object):
    
     exporter = 'v4'
     grouped_mode = False
@@ -550,8 +550,9 @@ sys.path.insert(0, root_path)
         self.helas_call_writers = helas_call_writers
 
     def generate_subprocess_directory(self, matrix_element, dummy_helas_model, me_number):
-        logger.info("Now generating TF output directory...")
-        exporter = TFMEExporter(matrix_element, self.helas_call_writers)
+        logger.info("Now generating Python output for %s"%(
+                matrix_element.get('processes')[0].nice_string().replace('Process','process')))
+        exporter = PythonMEExporter(matrix_element, self.helas_call_writers)
         
         try:
             matrix_methods = exporter.get_python_matrix_methods(gauge_check=False)
@@ -574,7 +575,7 @@ sys.path.insert(0, root_path)
         logger.info("Now outputting the model...")
 
         replace_dict = {}
-        model_exporter = UFOModelConverterTF(
+        model_exporter = UFOModelConverterPython(
             model, pjoin(self.export_dir, 'model'), wanted_lorentz = wanted_lorentz,
             wanted_couplings = wanted_couplings, replace_dict=replace_dict)
 

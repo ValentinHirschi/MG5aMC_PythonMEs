@@ -6,7 +6,7 @@ import math
 from phase_space_generator.vectors import Vector, LorentzVector
 from phase_space_generator.vectors import LorentzVectorDict, LorentzVectorList
 
-logger = logging.getLogger('TFMEs.PhaseSpaceGenerator')
+logger = logging.getLogger('MG5aMC_PythonMEs.PhaseSpaceGenerator')
 
 class Dimension(object):
     """ A dimension object specifying a specific integration dimension."""
