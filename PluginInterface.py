@@ -33,20 +33,34 @@ class MG5aMC_PythonMEsPluginInvalidCmd(InvalidCmd):
 class MG5aMC_PythonMEsInterface(madgraph_interface.MadGraphCmd, cmd.CmdShell):
     """ Interface for steering the generation/output of MG5aMC_PythonMEs.
     We make it inherit from CmdShell so that launch_ext_prog does not attempt to start in WebMode."""
-    
+
+    def __init__(self, *args, **opts):
+        super(MG5aMC_PythonMEsInterface, self).__init__(*args, **opts)
+        self.plugin_output_format_selected = None
+
     def do_output(self, line):
-        """ Wrapper to support the syntax output Python <args> """
+        """ Wrapper to support the syntax output Python <args>.
+        This just to add extra freedom in adding special action that may be needed at the output
+        stage for these output formats.
+        """
 
         args = self.split_arg(line)
         if len(args)>=1 and args[0]=='Python':
+            self.plugin_output_format_selected = 'Python'
             self.do_output_PythonMEs(' '.join(args[1:]))
+        elif len(args)>=1 and args[0]=='TF':
+            self.plugin_output_format_selected = 'TF'            
+            self.do_output_TFMEs(' '.join(args[1:]))            
         else:
             super(MG5aMC_PythonMEsInterface,self).do_output(' '.join(args))
 
     def do_output_PythonMEs(self, line):
         args = self.split_arg(line)
         super(MG5aMC_PythonMEsInterface,self).do_output(' '.join(['Python']+args))
-        
+
+    def do_output_TFMEs(self, line):
+        args = self.split_arg(line)
+        super(MG5aMC_PythonMEsInterface,self).do_output(' '.join(['TF']+args))
 
     def export(self,*args,**opts):
         """Overwrite this so as to force a pythia8 type of output if the output mode is PY8MEs."""
@@ -54,9 +68,16 @@ class MG5aMC_PythonMEsInterface(madgraph_interface.MadGraphCmd, cmd.CmdShell):
         if self._export_format == 'plugin':
             # Also pass on the aloha model to the exporter (if it has been computed already)
             # so that it will be used when generating the model
-            self._curr_exporter = PluginExporters.ProcessExporterPython(
-                        self._export_dir,
-                        helas_call_writers.PythonUFOHelasCallWriter(self._curr_model))
+            if self.plugin_output_format_selected == 'Python':
+                self._curr_exporter = PluginExporters.PluginProcessExporterPython(
+                            self._export_dir,
+                            helas_call_writers.PythonUFOHelasCallWriter(self._curr_model))
+            elif self.plugin_output_format_selected == 'TF':
+                self._curr_exporter = PluginExporters.PluginProcessExporterTF(
+                            self._export_dir,
+                            PluginExporters.UFOHelasCallWriterTF(self._curr_model))
+            else:
+                raise MadGraph5Error("A plugin output format must have been specified at this stage.")
 
         super(MG5aMC_PythonMEsInterface,self).export(*args, **opts)
 

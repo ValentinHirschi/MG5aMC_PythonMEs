@@ -371,6 +371,8 @@ class ProcessOutputPython(export_v4.ProcessExporterFortranSA):
 
 class PythonMEExporter(export_python.ProcessExporterPython):
 
+    matrix_method_template = 'matrix_method_python.py'
+
     def get_python_matrix_methods(self, gauge_check=False):
         """Write the matrix element calculation method for the processes"""
 
@@ -453,7 +455,7 @@ class PythonMEExporter(export_python.ProcessExporterPython):
                                         self.config_maps.setdefault(ime, []))
             replace_dict['amp2_lines'] = '\n        '.join(amp2_lines)
 
-            method_file = open(os.path.join(plugin_path, 'templates','matrix_method_python.py')).read()
+            method_file = open(os.path.join(plugin_path, 'templates',self.matrix_method_template)).read()
             method_file = method_file % replace_dict
 
             self.matrix_methods[process_string] = method_file
@@ -516,10 +518,14 @@ class PythonMEExporter(export_python.ProcessExporterPython):
                          "%(coup)s = model.%(coup)s"\
                               % {"coup": coup} for coup in couplings])
 
-class ProcessExporterPython(object):
+class PluginProcessExporterPython(object):
    
     exporter = 'v4'
     grouped_mode = False
+
+    MEExporter=PythonMEExporter
+    UFOModelConverter=UFOModelConverterPython
+    check_sa_template = 'check_sa.py'
 
     def __init__(self, export_dir, helas_call_writers):
         self.export_dir = export_dir
@@ -552,7 +558,7 @@ sys.path.insert(0, root_path)
     def generate_subprocess_directory(self, matrix_element, dummy_helas_model, me_number):
         logger.info("Now generating Python output for %s"%(
                 matrix_element.get('processes')[0].nice_string().replace('Process','process')))
-        exporter = PythonMEExporter(matrix_element, self.helas_call_writers)
+        exporter = self.MEExporter(matrix_element, self.helas_call_writers)
         
         try:
             matrix_methods = exporter.get_python_matrix_methods(gauge_check=False)
@@ -575,7 +581,7 @@ sys.path.insert(0, root_path)
         logger.info("Now outputting the model...")
 
         replace_dict = {}
-        model_exporter = UFOModelConverterPython(
+        model_exporter = self.UFOModelConverter(
             model, pjoin(self.export_dir, 'model'), wanted_lorentz = wanted_lorentz,
             wanted_couplings = wanted_couplings, replace_dict=replace_dict)
 
@@ -587,8 +593,38 @@ sys.path.insert(0, root_path)
         check_sa_path = pjoin(self.export_dir, 'check_sa.py')
         replace_dict = {'all_process_classes' : ', '.join(self.all_MEs)}
         open(check_sa_path,'w').write(
-            open(pjoin(plugin_path, 'templates', 'check_sa.py'),'r').read().format(**replace_dict))
+            open(pjoin(plugin_path, 'templates', self.check_sa_template),'r').read().format(**replace_dict))
 
         # Make check_sa.py executable
         os.chmod(check_sa_path, os.stat(check_sa_path).st_mode | stat.S_IEXEC)
+
+# ==================================================================================================
+# Classes below intended for the specialised TF output (which may or may not be needed in the end)
+# ==================================================================================================
+
+class ProcessOutputTF(ProcessOutputPython):
+    check = False
+    exporter = 'v4'
+    output = 'dir'
+
+class MEExporterTF(PythonMEExporter):
+    matrix_method_template = 'matrix_method_TF.py'    
+    # Specialisation for TF output to be implemented here
+    pass
+
+class UFOModelConverterTF(UFOModelConverterPython):
+    param_template_py = 'model_template_TF.py'    
+    # Specialisation for TF output to be implemented here
+    pass 
+
+class PluginProcessExporterTF(PluginProcessExporterPython):
+    MEExporter=MEExporterTF
+    UFOModelConverter=UFOModelConverterTF
+    check_sa_template = 'check_sa_TF.py'    
+    # Specialisation for TF output to be implemented here
+    pass
+
+class UFOHelasCallWriterTF(helas_call_writers.PythonUFOHelasCallWriter):
+    # Specialisation for TF output to be implemented here    
+    pass
 
