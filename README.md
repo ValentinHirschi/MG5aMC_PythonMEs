@@ -8,7 +8,7 @@ Over time, the goal is to adapt it so that it can be directly incorporated in a 
 ## Usage
 
 Copy this project in the `PLUGIN` folder located in the root directory of your `MG5aMC` distribution (v2.6.6+).
-The `MG5aMC` example script `test_TFMEs.mg5` can then simply be run as follows (from within the root directory of `MG5aMC`):
+The `MG5aMC` example script `test_MG5aMC_PythonMEs.mg5` can then simply be run as follows (from within the root directory of `MG5aMC`):
 ```
 ./bin/mg5_aMC --mode=MG5aMC_PythonMEs PLUGIN/TFMEs/test_MG5aMC_PythonMEs.mg5
 ```
