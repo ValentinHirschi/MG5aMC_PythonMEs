@@ -3,7 +3,7 @@
 This code is intended as a plugin to the High Energy Phsyics code [MadGraph5_aMC@NLO](https://launchpad.net/madgraph5).
 It offers a new output mode for the standalone computation of Matrix Elements of scattering amplitudes. This special `TFMEs` format is in pure Python.
 
-Over time, the goal is to adapt it so that it can be directly incorporated in a `TensorFlow` computational graph. The
+Over time, the goal is to adapt it so that it can be directly incorporated in a `TensorFlow` computational graph.
 
 ## Usage
 
