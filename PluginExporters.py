@@ -117,7 +117,7 @@ class UFOModelConverterPython(export_cpp.UFOModelConverterCPP):
         the two lists params_indep and params_dep"""
 
         # Keep only dependences on alphaS, to save time in execution
-        keys = self.model['parameters'].keys()
+        keys = list(self.model['parameters'].keys())
         keys.sort(key=len)
         params_ext = []
         for key in keys:
@@ -165,7 +165,7 @@ class UFOModelConverterPython(export_cpp.UFOModelConverterCPP):
         the two lists coups_indep and coups_dep"""
 
         # Keep only dependences on alphaS, to save time in execution
-        keys = self.model['couplings'].keys()
+        keys = list(self.model['couplings'].keys())
         keys.sort(key=len)
         for key, coup_list in self.model['couplings'].items():
             if "aS" in key:
@@ -186,7 +186,7 @@ class UFOModelConverterPython(export_cpp.UFOModelConverterCPP):
                                                                    c.depend))
 
         # Convert coupling expressions from Python to C++
-        for coup in self.coups_dep.values() + self.coups_indep:
+        for coup in list(self.coups_dep.values()) + list(self.coups_indep):
             coup.expr = coup.name + " = " + coup.expr
 
     # Routines for writing the parameter files
@@ -342,7 +342,7 @@ class UFOModelConverterPython(export_cpp.UFOModelConverterCPP):
         # Veto some imports
         vetoed_imports = ['import aloha.template_files.wavefunctions as wavefunctions']
         python_imports = [pi for pi in python_imports if pi not in vetoed_imports]
-        python_imports.insert(0, 'import wavefunctions')
+        python_imports.insert(0, 'from . import wavefunctions')
 
         aloha_output = open(pjoin(self.dir_path,'aloha_methods.py'),'w')
         aloha_output.write('from __future__ import division\n')
@@ -563,7 +563,7 @@ sys.path.insert(0, root_path)
         try:
             matrix_methods = exporter.get_python_matrix_methods(gauge_check=False)
             assert(len(matrix_methods)==1)
-        except helas_call_writers.HelasWriterError, error:
+        except (helas_call_writers.HelasWriterError, error):
             logger.critical(error)
             raise MadGraph5Error("Error when generation python matrix_element_methods.")
 

@@ -234,9 +234,9 @@ class LorentzVector(Vector):
                 logger.critical("Error in vectors.rotoboost: nonzero, unequal squares")
                 logger.critical("p = %s (%.9e)" % (str(p), p2))
                 logger.critical("q = %s (%.9e)" % (str(q), q2))
-                print "Error in vectors.rotoboost: nonzero, unequal squares"
-                print "p = %s (%.9e)" % (str(p), p2)
-                print "q = %s (%.9e)" % (str(q), q2)
+                print("Error in vectors.rotoboost: nonzero, unequal squares")
+                print("p = %s (%.9e)" % (str(p), p2))
+                print("q = %s (%.9e)" % (str(q), q2))
                 raise InvalidOperation
             # Compute scalar products
             pq = p + q

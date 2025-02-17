@@ -628,30 +628,30 @@ if __name__ == '__main__':
 
     momenta, wgt = my_PS_generator.generateKinematics(E_cm, random_variables)
    
-    print "\n ========================="
-    print " ||    PS generation    ||"
-    print " ========================="
+    print("\n =========================")
+    print(" ||    PS generation    ||")
+    print(" =========================")
 
-    print "\nRandom variables :\n",random_variables
-    print "\n%s\n"%momenta.__str__(n_initial=my_PS_generator.n_initial)
-    print "Phase-space weight : %.16e\n"%wgt,
+    print("\nRandom variables :\n",random_variables)
+    print("\n%s\n"%momenta.__str__(n_initial=my_PS_generator.n_initial))
+    print("Phase-space weight : %.16e\n"%wgt)
 
     variables_reconstructed, wgt_reconstructed = \
                                          my_PS_generator.invertKinematics(E_cm, momenta)
 
-    print "\n ========================="
-    print " || Kinematic inversion ||"
-    print " ========================="
-    print "\nReconstructed random variables :\n",variables_reconstructed
+    print("\n =========================")
+    print(" || Kinematic inversion ||")
+    print(" =========================")
+    print("\nReconstructed random variables :\n",variables_reconstructed)
     differences = [
         abs(variables_reconstructed[i]-random_variables[i])
         for i in range(len(variables_reconstructed))
     ]
-    print "Reconstructed weight = %.16e"%wgt_reconstructed
+    print("Reconstructed weight = %.16e"%wgt_reconstructed)
     if differences:
-        print "\nMax. relative diff. in reconstructed variables = %.3e"%\
-            max(differences[i]/random_variables[i] for i in range(len(differences)))
-    print "Rel. diff. in PS weight = %.3e\n"%((wgt_reconstructed-wgt)/wgt)
+        print("\nMax. relative diff. in reconstructed variables = %.3e"%\
+            max(differences[i]/random_variables[i] for i in range(len(differences))))
+    print("Rel. diff. in PS weight = %.3e\n"%((wgt_reconstructed-wgt)/wgt))
 
 
     print('-'*100)
